@@ -1,123 +1,162 @@
-(function ($) {
-  "use strict";
+/* ===================================
+--------------------------------------
+	Boto | Photography HTML Template
+	Version: 1.0
+	Copyright By: ColorLib
+--------------------------------------
+======================================*/
 
-  // Preloader (if the #preloader div exists)
-  $(window).on('load', function () {
-    if ($('#preloader').length) {
-      $('#preloader').delay(100).fadeOut('slow', function () {
-        $(this).remove();
-      });
-    }
-  });
+'use strict';
 
-  // Back to top button
-  $(window).scroll(function() {
-    if ($(this).scrollTop() > 100) {
-      $('.back-to-top').fadeIn('slow');
-    } else {
-      $('.back-to-top').fadeOut('slow');
-    }
-  });
-  $('.back-to-top').click(function(){
-    $('html, body').animate({scrollTop : 0},1500, 'easeInOutExpo');
-    return false;
-  });
+$(window).on('load', function() {
+	/*------------------
+		Preloder
+	--------------------*/
+	$(".loader").fadeOut();
+	$("#preloder").delay(400).fadeOut("slow");
 
-  // Initiate the wowjs animation library
-  new WOW().init();
+});
 
-  // Header scroll class
-  $(window).scroll(function() {
-    if ($(this).scrollTop() > 100) {
-      $('#header').addClass('header-scrolled');
-    } else {
-      $('#header').removeClass('header-scrolled');
-    }
-  });
+(function($) {
 
-  if ($(window).scrollTop() > 100) {
-    $('#header').addClass('header-scrolled');
-  }
+	/*------------------
+		Background Set
+	--------------------*/
+	$('.set-bg').each(function() {
+		var bg = $(this).data('setbg');
+		$(this).css('background-image', 'url(' + bg + ')');
+	});
 
-  // Smooth scroll for the navigation and links with .scrollto classes
-  $('.main-nav a, .mobile-nav a, .scrollto').on('click', function() {
-    if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
-      var target = $(this.hash);
-      if (target.length) {
-        var top_space = 0;
 
-        if ($('#header').length) {
-          top_space = $('#header').outerHeight();
+	/*------------------
+		Navigation
+	--------------------*/
+    $(".nav-switch").on('click', function (e) {
+		e.preventDefault();
+        $(".slicknav_btn").click();
+	});
+	
+	$('.nav__menu').slicknav({
+		'appendTo' : '.main__menu',
+		'openedSymbol': '<i class="fa fa-angle-up"></i>',
+		'closedSymbol': '<i class="fa fa-angle-right"></i>'
+	});
 
-          if (! $('#header').hasClass('header-scrolled')) {
-            top_space = top_space - 20;
-          }
-        }
-
-        $('html, body').animate({
-          scrollTop: target.offset().top - top_space
-        }, 1500, 'easeInOutExpo');
-
-        if ($(this).parents('.main-nav, .mobile-nav').length) {
-          $('.main-nav .active, .mobile-nav .active').removeClass('active');
-          $(this).closest('li').addClass('active');
-        }
-
-        if ($('body').hasClass('mobile-nav-active')) {
-          $('body').removeClass('mobile-nav-active');
-          $('.mobile-nav-toggle i').toggleClass('fa-times fa-bars');
-          $('.mobile-nav-overly').fadeOut();
-        }
-        return false;
-      }
-    }
-  });
-
-  // Navigation active state on scroll
-  var nav_sections = $('section');
-  var main_nav = $('.main-nav, .mobile-nav');
-  var main_nav_height = $('#header').outerHeight();
-
-  $(window).on('scroll', function () {
-    var cur_pos = $(this).scrollTop();
-  
-    nav_sections.each(function() {
-      var top = $(this).offset().top - main_nav_height,
-          bottom = top + $(this).outerHeight();
-  
-      if (cur_pos >= top && cur_pos <= bottom) {
-        main_nav.find('li').removeClass('active');
-        main_nav.find('a[href="#'+$(this).attr('id')+'"]').parent('li').addClass('active');
-      }
+	/*---------------
+		Search
+	----------------*/
+    $('.search-switch').on('click', function (e) {
+		e.preventDefault();
+        $('.search-model').fadeIn(400);
     });
-  });
 
-  // jQuery counterUp (used in Whu Us section)
-  $('[data-toggle="counter-up"]').counterUp({
-    delay: 10,
-    time: 1000
-  });
+    $('.search-close-switch').on('click', function () {
+        $('.search-model').fadeOut(400, function () {
+            $('#search-input').val('');
+        });
+	});
 
-  // Porfolio isotope and filter
-  $(window).on('load', function () {
-    var portfolioIsotope = $('.portfolio-container').isotope({
-      itemSelector: '.portfolio-item'
-    });
-    $('#portfolio-flters li').on( 'click', function() {
-      $("#portfolio-flters li").removeClass('filter-active');
-      $(this).addClass('filter-active');
-  
-      portfolioIsotope.isotope({ filter: $(this).data('filter') });
-    });
-  });
+	/*-------------------
+		Hero Slider
+	-------------------*/
+	$('.hero-slider').slick({
+		dots: false,
+		infinite: true,
+		speed: 300,
+		slidesToShow: 1,
+		centerMode: true,
+		variableWidth: true,
+		centerMode: true,
+		arrows: false,
+		asNavFor: '.hero-text-slider',
+		autoplay: true,
+		pauseOnHover:false,
+		autoplaySpeed: 3000,
+		responsive: [
+			{
+				breakpoint: 480,
+				settings: {
+					slidesToShow: 1,
+					slidesToScroll: 1
+				}
+			}
+		]
+	});
+	
+	var hero_slider = $('.hero-slider');
 
-  // Testimonials carousel (uses the Owl Carousel library)
-  $(".testimonials-carousel").owlCarousel({
-    autoplay: true,
-    dots: true,
-    loop: true,
-    items: 1
-  });
+	hero_slider.on('wheel', (function(e) {
+		e.preventDefault();
+		if (e.originalEvent.deltaY < 0) {
+			$(this).slick('slickPrev');
+		} else {
+			$(this).slick('slickNext');
+		}
+	}));
+
+	hero_slider.on('click', '.slick-slide', function (e) {
+		e.preventDefault();
+		var index = $(this).data("slick-index");
+		if ($('.slick-slider').slick('slickCurrentSlide') !== index) {
+			$('.slick-slider').slick('slickGoTo', index);
+		}
+	});
+
+	$('.hero-text-slider').slick({
+		dots: false,
+		infinite: false,
+		speed: 300,
+		arrows: false,
+		asNavFor: '.hero-slider',
+	});
+
+	/*-------------------
+		Blog Slider
+	-------------------*/
+	$('.blog__slider').slick({
+		dots: false,
+		infinite: true,
+		speed: 300,
+		arrows: false,
+		centerMode: true,
+		centerPadding: '190px',
+		slidesToShow: 2,
+		autoplay: true,
+		pauseOnHover:false,
+		responsive: [
+			{
+				breakpoint: 991,
+				settings: {
+				centerPadding: '0',
+				slidesToShow: 2,
+				slidesToScroll: 2
+				}
+			},
+			{
+				breakpoint: 480,
+				settings: {
+					centerMode: false,
+					slidesToShow: 1,
+					slidesToScroll: 1,
+					centerPadding: '0',
+				}
+			}
+		]
+	});
+
+	/*-------------------
+		Progress Bars
+	-------------------*/
+	$('.progress-bar-style').each(function() {
+		var progress = $(this).data("progress");
+		var prog_width = progress + '%';
+		if (progress <= 100) {
+			$(this).append('<div class="bar-inner" style="width:' + prog_width + '"></div>');
+		}
+		else {
+			$(this).append('<div class="bar-inner" style="width:100%"></div>');
+		}
+	});
 
 })(jQuery);
 
